@@ -12,16 +12,20 @@ type Package struct {
 	path string
 }
 
+func (p *Package) String() string {
+	return "Package for " + p.path
+}
+
 func (p *Package) add(path string) {
 	log.Printf("Adding %v", path)
 
 	dir, file := filepath.Split(path)
-	name := dir[len(p.path):]
+	name := dir[len(p.path)+1:]
 
 	tpl, ok := p.objects[name]
 	if !ok {
 		log.Printf("Creating new template, %v, for %v", file, dir)
-		tpl = template.New(file)
+		tpl = template.New(name)
 		p.objects[name] = tpl
 	}
 
@@ -38,12 +42,41 @@ func (p *Package) packageWalker(path string, f os.FileInfo, err error) error {
 	return nil
 }
 
+func (p *Package) Get(objectName string) *template.Template {
+	object, ok := p.objects[objectName]
+	if !ok {
+		return nil
+	}
+
+	return object
+}
+
+func (p *Package) Contains(objectName, method string) bool {
+	object := p.Get(objectName)
+	if object == nil {
+		return false
+	}
+
+	tpl := object.Lookup(method)
+
+	return tpl != nil
+}
+
 func (p *Package) Print() {
 	log.Printf("Printing %v", p.path)
 	//printTemplate(p.objects, 2, 0)
 	for i, j := range p.objects {
-		log.Printf("%v: %v", i, j)
+		//log.Printf("%v: %v", i, getTemplate(j.Name()))
+		log.Printf("%v: %v", i, getTemplate(j))
 	}
+}
+
+func getTemplate(tpl *template.Template) (s string) {
+	for _, j := range tpl.Templates() {
+		s += j.Name() + ", "
+	}
+
+	return s
 }
 
 func printTemplate(tpl *template.Template, max, level int) {
