@@ -1,4 +1,5 @@
 package templates
+
 import "testing"
 
 func TestDefault(t *testing.T) {

@@ -67,7 +67,7 @@ func (p *Package) Print() {
 	//printTemplate(p.objects, 2, 0)
 	for i, j := range p.objects {
 		//log.Printf("%v: %v", i, getTemplate(j.Name()))
-		log.Printf("%v: %v", i, getTemplate(j))
+		log.Printf("%v: [%v]", i, getTemplate(j))
 	}
 }
 
