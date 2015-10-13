@@ -52,11 +52,13 @@ func (m *Manager) GetObjectTemplate(themeName, packageName string, object interf
 
 // GetObjectTemplate retrieves a template given a certain type
 func (m *Manager) GetTypeTemplate(themeName, packageName string, t reflect.Type, object interface{}, method string) (*template.Template, error) {
+	log.Printf("NAME=%v+%v", t.PkgPath(), t.Name())
 	name := filepath.Join(t.PkgPath(), t.Name())
-	println("OBJ, theme:", themeName, "platform:", packageName, "Name:", name, "method:", method, "tname:", t.Name(), "pkg.", t.PkgPath())
+	log.Printf("Theme: %v, Package: %v, Name: %v, method: %v, tname: %v, pkg: ", themeName, packageName, name, method, t.Name(), t.PkgPath())
 	tpl, err := m.GetTemplate(themeName, packageName, name, method + m.extension)
 
 	if err != nil {
+		log.Printf("FAILED2, %v", err)
 		superType := reflect.TypeOf((*Super)(nil)).Elem()
 		if t.Implements(superType) {
 			log.Printf("Supertype: %v", superType)
@@ -69,12 +71,13 @@ func (m *Manager) GetTypeTemplate(themeName, packageName string, t reflect.Type,
 		return nil, err
 	}
 
+	log.Printf("HEJ")
 	return tpl, nil
 }
 
 // Already has extension!?
 func (m *Manager) GetTemplate(themeName, packageName, object, name string) (*template.Template, error) {
-	println(themeName, packageName, object, name)
+	log.Printf("%v - %v - %v - %v", themeName, packageName, object, name)
 
 	theme, err := m.getTemplate(themeName, packageName, object)
 	if err != nil {
@@ -88,6 +91,7 @@ func (m *Manager) GetTemplate(themeName, packageName, object, name string) (*tem
 	template := theme.Lookup(name)
 
 	if template == nil {
+		log.Printf("NAY")
 		if themeName != m.defaultThemeName {
 			// If not the default theme, try that!
 			return m.GetTemplate(m.defaultThemeName, packageName, object, name)
@@ -96,8 +100,11 @@ func (m *Manager) GetTemplate(themeName, packageName, object, name string) (*tem
 			return nil, fmt.Errorf("Template, " + name + ", does not exist")
 		}
 	} else {
+		log.Printf("WWATATAT")
 		return template, nil
 	}
+
+
 }
 
 // getTemplate retrieves the template given the object name
@@ -110,9 +117,9 @@ func (m *Manager) getTemplate(themeName, packageName, object string) (*template.
 
 	pack, ok2 := theme.packages[packageName]
 	if pack == nil {
-		return nil, fmt.Errorf("Platform " + packageName + " does not exist")
+		return nil, fmt.Errorf("Package " + packageName + " does not exist")
 	}
-	println("Platform exists:", packageName, ok2)
+	println("Package exists:", packageName, ok2)
 
 	obj, ok3 := pack.objects[object]
 	if obj == nil {

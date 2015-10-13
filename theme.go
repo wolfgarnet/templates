@@ -3,7 +3,7 @@ package templates
 import (
 	"log"
 	"io/ioutil"
-	"strings"
+	"path/filepath"
 )
 
 type Theme struct {
@@ -12,11 +12,14 @@ type Theme struct {
 }
 
 func (t Theme) String() string {
-	return "Theme " + t.name
+	return t.name
 }
 
 func NewTheme(path string) *Theme {
-	theme := &Theme{make(map[string]*Package), strings.Trim(path, "/\\")}
+	name := filepath.Base(path)
+
+	theme := &Theme{make(map[string]*Package), name}
+	log.Printf("New theme: %v", theme)
 
 	files, _ := ioutil.ReadDir(path)
 	for _, f := range files {

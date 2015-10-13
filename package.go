@@ -5,6 +5,7 @@ import (
 	"os"
 	"log"
 	"path/filepath"
+	"strings"
 )
 
 type Package struct {
@@ -20,7 +21,7 @@ func (p *Package) add(path string) {
 	log.Printf("Adding %v", path)
 
 	dir, file := filepath.Split(path)
-	name := dir[len(p.path)+1:]
+	name := strings.Trim(dir[len(p.path)+1:], "/\\")
 
 	tpl, ok := p.objects[name]
 	if !ok {
@@ -94,7 +95,7 @@ func printTemplate(tpl *template.Template, max, level int) {
 }
 
 func NewPackage(path string) *Package {
-	log.Printf("New package: %v", path)
+	log.Printf("New package from %v", path)
 
 	p := &Package{}
 	p.objects = make(map[string]*template.Template)
