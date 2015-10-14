@@ -78,7 +78,6 @@ func (m *Manager) GetTypeTemplate(themeName, packageName string, t reflect.Type,
 		return nil, err
 	}
 
-	log.Printf("HEJ")
 	return tpl, nil
 }
 
