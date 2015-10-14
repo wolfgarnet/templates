@@ -11,6 +11,7 @@ import (
 type Package struct {
 	objects map[string]*template.Template
 	path string
+	libPath string
 }
 
 func (p *Package) String() string {
@@ -27,6 +28,7 @@ func (p *Package) add(path string) {
 	if !ok {
 		log.Printf("Creating new template, %v, for %v", file, dir)
 		tpl = template.New(name)
+		p.addLib(tpl)
 		p.objects[name] = tpl
 	}
 
@@ -36,7 +38,26 @@ func (p *Package) add(path string) {
 	}
 }
 
+func (p *Package) addLib(tpl *template.Template) {
+	glob := p.path + string(os.PathSeparator) + p.libPath + "/*.html"
+	log.Printf("Adding lib: %v", glob)
+	tpl.ParseGlob(glob)
+}
+
 func (p *Package) packageWalker(path string, f os.FileInfo, err error) error {
+	log.Printf("Path: %v(%v)", path, p.path)
+	l := len(p.path)
+	l2 := len(p.libPath)
+
+	if len(path) < l+l2 {
+		return nil
+	}
+
+	sub := path[l+1:l+1+len(p.libPath)]
+	//log.Printf("l: %v, l2: %v ===== %v", l, l2, sub)
+	if sub == p.libPath {
+		return nil
+	}
 	if f.Mode().IsRegular() && path[len(path)-1:] != "~" {
 		p.add(path)
 	}
@@ -100,6 +121,7 @@ func NewPackage(path string) *Package {
 	p := &Package{}
 	p.objects = make(map[string]*template.Template)
 	p.path = path
+	p.libPath = "lib"
 
 	filepath.Walk(path, p.packageWalker)
 

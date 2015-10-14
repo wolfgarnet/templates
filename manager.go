@@ -1,10 +1,12 @@
 package templates
+
 import (
 	"reflect"
 	"html/template"
 	"path/filepath"
 	"log"
 	"fmt"
+	"io/ioutil"
 )
 
 type Super interface {
@@ -31,11 +33,16 @@ func (m *Manager) AddTheme(theme *Theme) {
 	m.themes[theme.name] = theme
 }
 
-/*
 func (m *Manager) Parse(path string) {
-
+	files, _ := ioutil.ReadDir(path)
+	for _, f := range files {
+		if f.IsDir() {
+			log.Printf("Parsing %v from %v", f.Name(), path)
+			t := NewTheme(path + f.Name())
+			m.AddTheme(t)
+		}
+	}
 }
-*/
 
 // GetObjectTemplate retrieves a template given an anonymous object
 func (m *Manager) GetObjectTemplate(themeName, packageName string, object interface{}, method string) (*template.Template, error) {
