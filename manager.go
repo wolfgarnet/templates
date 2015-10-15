@@ -7,7 +7,11 @@ import (
 	"log"
 	"fmt"
 	"io/ioutil"
+
+	"github.com/wolfgarnet/logging"
 )
+
+var logger logging.Logger
 
 type Super interface {
 	Super() interface{}
@@ -59,7 +63,7 @@ func (m *Manager) GetObjectTemplate(themeName, packageName string, object interf
 
 // GetObjectTemplate retrieves a template given a certain type
 func (m *Manager) GetTypeTemplate(themeName, packageName string, t reflect.Type, object interface{}, method string) (*template.Template, error) {
-	log.Printf("NAME=%v+%v", t.PkgPath(), t.Name())
+	logger.Debug("NAME=%v+%v", t.PkgPath(), t.Name())
 	name := filepath.Join(t.PkgPath(), t.Name())
 	log.Printf("Theme: %v, Package: %v, Name: %v, method: %v, tname: %v, pkg: ", themeName, packageName, name, method, t.Name(), t.PkgPath())
 	tpl, err := m.GetTemplate(themeName, packageName, name, method + m.extension)
