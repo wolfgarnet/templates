@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 	"log"
 	"fmt"
+	"io/ioutil"
 
 	"github.com/wolfgarnet/logging"
 )
@@ -36,11 +37,16 @@ func (m *Manager) AddTheme(theme *Theme) {
 	m.themes[theme.name] = theme
 }
 
-/*
 func (m *Manager) Parse(path string) {
-
+	files, _ := ioutil.ReadDir(path)
+	for _, f := range files {
+		if f.IsDir() {
+			log.Printf("Parsing %v from %v", f.Name(), path)
+			t := NewTheme(path + f.Name())
+			m.AddTheme(t)
+		}
+	}
 }
-*/
 
 // GetObjectTemplate retrieves a template given an anonymous object
 func (m *Manager) GetObjectTemplate(themeName, packageName string, object interface{}, view string, trySuper bool) (*template.Template, error) {
@@ -57,7 +63,7 @@ func (m *Manager) GetObjectTemplate(themeName, packageName string, object interf
 
 // GetObjectTemplate retrieves a template given a certain type
 func (m *Manager) GetTypeTemplate(themeName, packageName string, t reflect.Type, object interface{}, view string, trySuper bool) (*template.Template, error) {
-	log.Printf("NAME=%v+%v", t.PkgPath(), t.Name())
+	logger.Debug("NAME=%v+%v", t.PkgPath(), t.Name())
 	name := filepath.Join(t.PkgPath(), t.Name())
 	log.Printf("Theme: %v, Package: %v, View: %v, method: %v, tname: %v, pkg: ", themeName, packageName, name, view, t.Name(), t.PkgPath())
 	tpl, err := m.GetTemplate(themeName, packageName, name, view + m.extension)
@@ -79,7 +85,6 @@ func (m *Manager) GetTypeTemplate(themeName, packageName string, t reflect.Type,
 		return nil, err
 	}
 
-	log.Printf("HEJ")
 	return tpl, nil
 }
 
