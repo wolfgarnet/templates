@@ -154,3 +154,15 @@ func (m *Manager) RenderObject(themeName, packageName string, object interface{}
 	return &Renderer{object, t, "TEST", m}, nil
 
 }
+
+func (m *Manager) RenderType(themeName, packageName string, typePath, view string, trySuper bool) (*Renderer, error) {
+	logger.Debug("Rendering type: {} with {}", typePath, view)
+
+	t, err := m.GetObjectTemplate(themeName, packageName, object, view, trySuper)
+	if err != nil {
+		return nil, err
+	}
+
+	return &Renderer{object, t, "TEST", m}, nil
+
+}
