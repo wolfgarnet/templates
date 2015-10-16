@@ -56,7 +56,7 @@ func (m *Manager) GetObjectTemplate(themeName, packageName string, object interf
 		t = t.Elem()
 	}
 
-	logger.("Getting template for %v of type %v", object, t)
+	logger.Debug("Getting template for %v of type %v", object, t)
 
 	return m.GetTypeTemplate(themeName, packageName, t, object, view, trySuper)
 }
