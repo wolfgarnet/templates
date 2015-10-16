@@ -154,19 +154,19 @@ func (m *Manager) RenderObject(themeName, packageName string, object interface{}
 		return nil, err
 	}
 
-	return &Renderer{object, t, "TEST", m}, nil
+	return &Renderer{themeName, packageName, object, t, "TEST", m}, nil
 
 }
 
 // RenderType renders given a type
-func (m *Manager) RenderType(themeName, packageName string, typePath, view string, trySuper bool) (*Renderer, error) {
-	logger.Debug("Rendering type: {} with {}", typePath, view)
+func (m *Manager) RenderType(themeName, packageName string, t reflect.Type, view string) (*Renderer, error) {
+	logger.Debug("Rendering type: {} with {}", t, view)
 
-	t, err := m.GetTypeTemplate(themeName, packageName, view, trySuper)
+	tpl, err := m.GetTypeTemplate(themeName, packageName, t, view)
 	if err != nil {
 		return nil, err
 	}
 
-	return &Renderer{nil, t, "TEST", m}, nil
+	return &Renderer{themeName, packageName, nil, tpl, "TEST", m}, nil
 
 }

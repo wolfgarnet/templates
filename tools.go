@@ -1,6 +1,9 @@
 package templates
 
-import "bytes"
+import (
+	"bytes"
+	"reflect"
+)
 
 type Tools struct {
 	renderer *Renderer
@@ -19,6 +22,14 @@ func (t Tools) Render(object interface{}, view string, trySuper bool) string {
 	return b.String()
 }
 
-func (t Tools) RenderStatic() string {
-	return "HEJ"
+func (t Tools) RenderStatic(tt reflect.Type, view string) string {
+	renderer, err := t.renderer.manager.RenderType(t.renderer.ThemeName, t.renderer.PackageName, tt, view)
+
+	if err != nil {
+		return err.Error()
+	}
+
+	b := new(bytes.Buffer)
+	renderer.Render(b)
+	return b.String()
 }
