@@ -151,6 +151,6 @@ func (m *Manager) RenderObject(themeName, packageName string, object interface{}
 		return nil, err
 	}
 
-	return &Renderer{object, t, "TEST"}, nil
+	return &Renderer{object, t, "TEST", m}, nil
 
 }

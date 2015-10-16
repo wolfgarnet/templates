@@ -9,6 +9,7 @@ type Renderer struct {
 	Object interface{}
 	Template *template.Template
 	Title string
+	manager *Manager
 }
 
 func (r Renderer) Run(writer io.Writer) error {
