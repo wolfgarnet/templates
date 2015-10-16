@@ -61,7 +61,7 @@ func TestManagerDefault(t *testing.T) {
 
 	var buffer bytes.Buffer
 	tpl.Execute(&buffer, o1)
-	
+
 	if buffer.String() != "CONFIG" {
 		t.Errorf("Failed")
 	}

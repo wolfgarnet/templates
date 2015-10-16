@@ -18,14 +18,14 @@ func (p *Package) String() string {
 }
 
 func (p *Package) add(path string) {
-	log.Printf("Adding %v", path)
+	logger.Debug("Adding %v", path)
 
 	dir, file := filepath.Split(path)
 	name := strings.Trim(dir[len(p.path)+1:], "/\\")
 
 	tpl, ok := p.objects[name]
 	if !ok {
-		log.Printf("Creating new template, %v, for %v", file, dir)
+		logger.Debug("Creating new template, %v, for %v", file, dir)
 		tpl = template.New(name)
 		p.objects[name] = tpl
 	}
@@ -95,7 +95,7 @@ func printTemplate(tpl *template.Template, max, level int) {
 }
 
 func NewPackage(path string) *Package {
-	log.Printf("New package from %v", path)
+	logger.Debug("New package from %v", path)
 
 	p := &Package{}
 	p.objects = make(map[string]*template.Template)

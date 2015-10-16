@@ -1,11 +1,16 @@
 package templates
+
 import (
 	"reflect"
 	"html/template"
 	"path/filepath"
 	"log"
 	"fmt"
+
+	"github.com/wolfgarnet/logging"
 )
+
+var logger logging.Logger
 
 type Super interface {
 	Super() interface{}
@@ -38,34 +43,37 @@ func (m *Manager) Parse(path string) {
 */
 
 // GetObjectTemplate retrieves a template given an anonymous object
-func (m *Manager) GetObjectTemplate(themeName, packageName string, object interface{}, method string) (*template.Template, error) {
+func (m *Manager) GetObjectTemplate(themeName, packageName string, object interface{}, view string, trySuper bool) (*template.Template, error) {
 
 	t := reflect.TypeOf(object)
 	if t.Kind() == reflect.Ptr {
 		t = t.Elem()
 	}
 
-	log.Printf("Getting template for %v of type %v", object, t)
+	logger.("Getting template for %v of type %v", object, t)
 
-	return m.GetTypeTemplate(themeName, packageName, t, object, method)
+	return m.GetTypeTemplate(themeName, packageName, t, object, view, trySuper)
 }
 
 // GetObjectTemplate retrieves a template given a certain type
-func (m *Manager) GetTypeTemplate(themeName, packageName string, t reflect.Type, object interface{}, method string) (*template.Template, error) {
+func (m *Manager) GetTypeTemplate(themeName, packageName string, t reflect.Type, object interface{}, view string, trySuper bool) (*template.Template, error) {
 	log.Printf("NAME=%v+%v", t.PkgPath(), t.Name())
 	name := filepath.Join(t.PkgPath(), t.Name())
-	log.Printf("Theme: %v, Package: %v, Name: %v, method: %v, tname: %v, pkg: ", themeName, packageName, name, method, t.Name(), t.PkgPath())
-	tpl, err := m.GetTemplate(themeName, packageName, name, method + m.extension)
+	log.Printf("Theme: %v, Package: %v, View: %v, method: %v, tname: %v, pkg: ", themeName, packageName, name, view, t.Name(), t.PkgPath())
+	tpl, err := m.GetTemplate(themeName, packageName, name, view + m.extension)
 
 	if err != nil {
-		log.Printf("FAILED2, %v", err)
-		superType := reflect.TypeOf((*Super)(nil)).Elem()
-		if t.Implements(superType) {
-			log.Printf("Supertype: %v", superType)
-			sm, err2 := object.(Super)
-			log.Printf("SM: %v -- %v", sm, err2)
-			// Recursive call the GetObjectTemplate method
-			return m.GetObjectTemplate(themeName, packageName, sm.Super(), method)
+		if trySuper {
+			log.Printf("FAILED2, %v", err)
+			superType := reflect.TypeOf((*Super)(nil)).Elem()
+			if t.Implements(superType) {
+				log.Printf("Supertype: %v", superType)
+				sm, err2 := object.(Super)
+				log.Printf("SM: %v -- %v", sm, err2)
+
+				// Recursive call the GetObjectTemplate method
+				return m.GetObjectTemplate(themeName, packageName, sm.Super(), view, trySuper)
+			}
 		}
 
 		return nil, err
@@ -128,4 +136,16 @@ func (m *Manager) getTemplate(themeName, packageName, object string) (*template.
 	println("Object exists:", object, ok3)
 
 	return obj, nil
+}
+
+func (m *Manager) RenderObject(themeName, packageName string, object interface{}, view string, trySuper bool) (*Runner, error) {
+	logger.Debug("Rendering object: {} with {}", object, view)
+
+	t, err := m.GetObjectTemplate(themeName, packageName, object, view, trySuper)
+	if err != nil {
+		return nil, err
+	}
+
+	return &Runner{object, t, "TEST"}, nil
+
 }
