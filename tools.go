@@ -18,3 +18,7 @@ func (t Tools) Render(object interface{}, view string, trySuper bool) string {
 	renderer.Render(b)
 	return b.String()
 }
+
+func (t Tools) RenderStatic() string {
+	return "HEJ"
+}
