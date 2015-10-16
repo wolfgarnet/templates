@@ -143,7 +143,7 @@ func (m *Manager) getTemplate(themeName, packageName, object string) (*template.
 	return obj, nil
 }
 
-func (m *Manager) RenderObject(themeName, packageName string, object interface{}, view string, trySuper bool) (*Runner, error) {
+func (m *Manager) RenderObject(themeName, packageName string, object interface{}, view string, trySuper bool) (*Renderer, error) {
 	logger.Debug("Rendering object: {} with {}", object, view)
 
 	t, err := m.GetObjectTemplate(themeName, packageName, object, view, trySuper)
@@ -151,6 +151,6 @@ func (m *Manager) RenderObject(themeName, packageName string, object interface{}
 		return nil, err
 	}
 
-	return &Runner{object, t, "TEST"}, nil
+	return &Renderer{object, t, "TEST"}, nil
 
 }
