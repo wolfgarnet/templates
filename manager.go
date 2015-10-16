@@ -50,6 +50,7 @@ func (m *Manager) Parse(path string) {
 
 // GetObjectTemplate retrieves a template given an anonymous object
 func (m *Manager) GetObjectTemplate(themeName, packageName string, object interface{}, view string, trySuper bool) (*template.Template, error) {
+	logger.Debug("Getting object template for {} with {}", object, view)
 
 	t := reflect.TypeOf(object)
 	if t.Kind() == reflect.Ptr {
@@ -58,15 +59,7 @@ func (m *Manager) GetObjectTemplate(themeName, packageName string, object interf
 
 	logger.Debug("Getting template for %v of type %v", object, t)
 
-	return m.GetTypeTemplate(themeName, packageName, t, object, view, trySuper)
-}
-
-// GetObjectTemplate retrieves a template given a certain type
-func (m *Manager) GetTypeTemplate(themeName, packageName string, t reflect.Type, object interface{}, view string, trySuper bool) (*template.Template, error) {
-	logger.Debug("NAME=%v+%v", t.PkgPath(), t.Name())
-	name := filepath.Join(t.PkgPath(), t.Name())
-	log.Printf("Theme: %v, Package: %v, View: %v, method: %v, tname: %v, pkg: ", themeName, packageName, name, view, t.Name(), t.PkgPath())
-	tpl, err := m.GetTemplate(themeName, packageName, name, view + m.extension)
+	tpl, err := m.GetTypeTemplate(themeName, packageName, t, view)
 
 	if err != nil {
 		if trySuper {
@@ -86,6 +79,15 @@ func (m *Manager) GetTypeTemplate(themeName, packageName string, t reflect.Type,
 	}
 
 	return tpl, nil
+}
+
+// GetObjectTemplate retrieves a template given a certain type
+func (m *Manager) GetTypeTemplate(themeName, packageName string, t reflect.Type, view string) (*template.Template, error) {
+	logger.Debug("Getting type template=%v+%v", t.PkgPath(), t.Name())
+
+	name := filepath.Join(t.PkgPath(), t.Name())
+	log.Printf("Theme: %v, Package: %v, View: %v, method: %v, tname: %v, pkg: ", themeName, packageName, name, view, t.Name(), t.PkgPath())
+	return m.GetTemplate(themeName, packageName, name, view + m.extension)
 }
 
 // Already has extension!?
@@ -143,6 +145,7 @@ func (m *Manager) getTemplate(themeName, packageName, object string) (*template.
 	return obj, nil
 }
 
+// RenderObject renders an object
 func (m *Manager) RenderObject(themeName, packageName string, object interface{}, view string, trySuper bool) (*Renderer, error) {
 	logger.Debug("Rendering object: {} with {}", object, view)
 
@@ -155,14 +158,15 @@ func (m *Manager) RenderObject(themeName, packageName string, object interface{}
 
 }
 
+// RenderType renders given a type
 func (m *Manager) RenderType(themeName, packageName string, typePath, view string, trySuper bool) (*Renderer, error) {
 	logger.Debug("Rendering type: {} with {}", typePath, view)
 
-	t, err := m.GetObjectTemplate(themeName, packageName, object, view, trySuper)
+	t, err := m.GetTypeTemplate(themeName, packageName, view, trySuper)
 	if err != nil {
 		return nil, err
 	}
 
-	return &Renderer{object, t, "TEST", m}, nil
+	return &Renderer{nil, t, "TEST", m}, nil
 
 }
