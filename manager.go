@@ -154,8 +154,7 @@ func (m *Manager) RenderObject(themeName, packageName string, object interface{}
 		return nil, err
 	}
 
-	return &Renderer{themeName, packageName, object, t, "TEST", m}, nil
-
+	return &Renderer{themeName, packageName, object, t, "TEST", m, make(map[string]interface{})	}, nil
 }
 
 // RenderType renders given a type
@@ -167,6 +166,6 @@ func (m *Manager) RenderType(themeName, packageName string, t reflect.Type, view
 		return nil, err
 	}
 
-	return &Renderer{themeName, packageName, nil, tpl, "TEST", m}, nil
+	return &Renderer{themeName, packageName, nil, tpl, "TEST", m, make(map[string]interface{})}, nil
 
 }

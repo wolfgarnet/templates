@@ -11,6 +11,11 @@ type Renderer struct {
 	Template *template.Template
 	Title string
 	manager *Manager
+	data map[string]interface{}
+}
+
+func (r *Renderer) AddData(field string, data interface{}) {
+	r.data[field] = data
 }
 
 func (r *Renderer) Render(writer io.Writer) error {
@@ -20,6 +25,7 @@ func (r *Renderer) Render(writer io.Writer) error {
 		"tools": Tools{r},
 		"Title": r.Title,
 		"test": "test1",
+		"data": r.data,
 	})
 
 	return nil
