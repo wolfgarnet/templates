@@ -20,7 +20,7 @@ func (r *Renderer) AddData(field string, data interface{}) {
 
 func (r *Renderer) Render(writer io.Writer) error {
 	//println("RUNNING TEMPLATE RUNNER", reflect.TypeOf(r.Object).Elem().Name())
-	r.Template.Execute(writer, map[string]interface{} {
+	err := r.Template.Execute(writer, map[string]interface{} {
 		"instance": r.Object,
 		"tools": Tools{r},
 		"Title": r.Title,
@@ -28,5 +28,9 @@ func (r *Renderer) Render(writer io.Writer) error {
 		"data": r.data,
 	})
 
-	return nil
+	if err != nil {
+		logger.Warning("Error while rendering: %v", err)
+	}
+
+	return err
 }
