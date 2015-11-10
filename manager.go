@@ -86,13 +86,13 @@ func (m *Manager) GetTypeTemplate(themeName, packageName string, t reflect.Type,
 	logger.Debug("Getting type template=%v+%v", t.PkgPath(), t.Name())
 
 	name := filepath.Join(t.PkgPath(), t.Name())
-	log.Printf("Theme: %v, Package: %v, View: %v, method: %v, tname: %v, pkg: ", themeName, packageName, name, view, t.Name(), t.PkgPath())
+	logger.Debug("Theme: %v, Package: %v, View: %v, method: %v, tname: %v, pkg: %v", themeName, packageName, name, view, t.Name(), t.PkgPath())
 	return m.GetTemplate(themeName, packageName, name, view + m.extension)
 }
 
 // Already has extension!?
 func (m *Manager) GetTemplate(themeName, packageName, object, name string) (*template.Template, error) {
-	log.Printf("%v - %v - %v - %v", themeName, packageName, object, name)
+	logger.Debug("Getting template: %v - %v - %v - %v", themeName, packageName, object, name)
 
 	theme, err := m.getTemplate(themeName, packageName, object)
 	if err != nil {
@@ -106,7 +106,7 @@ func (m *Manager) GetTemplate(themeName, packageName, object, name string) (*tem
 	template := theme.Lookup(name)
 
 	if template == nil {
-		log.Printf("NAY")
+		logger.Debug("No template found, trying default if not....")
 		if themeName != m.defaultThemeName {
 			// If not the default theme, try that!
 			return m.GetTemplate(m.defaultThemeName, packageName, object, name)
@@ -115,7 +115,7 @@ func (m *Manager) GetTemplate(themeName, packageName, object, name string) (*tem
 			return nil, fmt.Errorf("Template, " + name + ", does not exist")
 		}
 	} else {
-		log.Printf("WWATATAT")
+		logger.Debug("Returning template: %v", template)
 		return template, nil
 	}
 
@@ -128,19 +128,19 @@ func (m *Manager) getTemplate(themeName, packageName, object string) (*template.
 	if theme == nil {
 		return nil, fmt.Errorf("Theme " + themeName + " does not exist")
 	}
-	println("Theme exists:", themeName, ok1)
+	logger.Debug("Theme exists:", themeName, ok1)
 
 	pack, ok2 := theme.packages[packageName]
 	if pack == nil {
 		return nil, fmt.Errorf("Package " + packageName + " does not exist")
 	}
-	println("Package exists:", packageName, ok2)
+	logger.Debug("Package exists:", packageName, ok2)
 
 	obj, ok3 := pack.objects[object]
 	if obj == nil {
 		return nil, fmt.Errorf("Object " + object + " does not exist")
 	}
-	println("Object exists:", object, ok3)
+	logger.Debug("Object exists:", object, ok3)
 
 	return obj, nil
 }

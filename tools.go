@@ -11,8 +11,10 @@ type Tools struct {
 }
 
 func (t Tools) Render(object interface{}, view string, trySuper bool) template.HTML {
-	logger.Debug("Tool render {}, {}", object, view)
+	logger.Debug("Tool render %v, %v - %v", object, view, trySuper)
 	renderer, err:= t.renderer.manager.RenderObject(t.renderer.ThemeName, t.renderer.PackageName, object, view, trySuper)
+
+	logger.Debug("-------> %v(%v)", renderer, err)
 
 	if err != nil {
 		return template.HTML(err.Error())
@@ -20,6 +22,7 @@ func (t Tools) Render(object interface{}, view string, trySuper bool) template.H
 
 	b := new(bytes.Buffer)
 	renderer.Render(b)
+	logger.Debug("I GOT: %v", b.String())
 	return template.HTML(b.String())
 }
 
